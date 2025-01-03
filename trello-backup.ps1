@@ -106,8 +106,14 @@ try {
     $boardsUrl = "https://api.trello.com/1/members/me/boards?key=$apiKey&token=$token"
     $boards = Invoke-TrelloAPI -url $boardsUrl
 
+    if (-not $boards -or $boards.Count -eq 0) {
+        Log-Message -level "WARNING" -message "No boards found for backup."
+        exit
+    }
+
     $totalBoards = $boards.Count
     $currentBoard = 0
+    $errorCount = 0
 
     # Backup each board
     foreach ($board in $boards) {
@@ -139,6 +145,7 @@ try {
 
             Log-Message -level "INFO" -message "Backed up board '$boardName' to $backupFile"
         } catch {
+            $errorCount++
             Log-Message -level "WARNING" -message "Error backing up board '$boardName' (ID: $boardId): $_"
         }
     }
@@ -150,6 +157,15 @@ try {
 
     # Clean up old backups
     Cleanup-OldBackups -directory $outputDirectory -retentionDays $retentionDays
+
+    # Summary Report
+    $summary = @{
+        TotalBoards       = $totalBoards
+        SkippedBoards     = $excludedBoards.Count
+        BackedUpBoards    = $totalBoards - $excludedBoards.Count - $errorCount
+        ErrorsEncountered = $errorCount
+    } | ConvertTo-Json -Depth 10
+    Log-Message -level "INFO" -message "Backup Summary: $summary"
 
     Log-Message -level "INFO" -message "Backup process completed successfully."
 } catch {
