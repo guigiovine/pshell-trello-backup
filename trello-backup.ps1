@@ -37,16 +37,24 @@ function Invoke-TrelloAPI {
     param (
         [string]$url
     )
+    $maxRetries = 3
+    $retryCount = 0
+    while ($retryCount -lt $maxRetries) {
     try {
         return Invoke-RestMethod -Uri $url -Method Get
     } catch {
+            $retryCount++
+            Start-Sleep -Seconds 2
+            if ($retryCount -ge $maxRetries) {
         $errorDetails = @{
             URL        = $url
             Error      = $_.Exception.Message
             StackTrace = $_.Exception.StackTrace
         } | ConvertTo-Json -Depth 10 -Compress
-        Log-Message -level "ERROR" -message "Error calling Trello API: $errorDetails"
+                Log-Message -level "ERROR" -message "Max retries reached for URL: $url. Error: $errorDetails"
         throw
+    }
+}
     }
 }
 
