@@ -1,4 +1,4 @@
-# Trello Backup Script
+# PowerShell Trello Backup Script
 
 A robust PowerShell script to back up Trello boards, separating active and closed boards, excluding specified boards, and archiving backups into a single ZIP file.
 
@@ -15,7 +15,7 @@ A robust PowerShell script to back up Trello boards, separating active and close
 
 - **PowerShell**: Ensure you have PowerShell installed on your system.
 - **Trello API Key and Token**:
-  - Obtain your API key and token from [Trello Developer Portal](https://trello.com/app-key).
+  - Obtain your API key and token from [Trello Developer Portal](https://developer.atlassian.com/cloud/trello/guides/rest-api/api-introduction/).
 
 ## Setup
 
