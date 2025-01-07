@@ -1,7 +1,7 @@
 # Configuration
 $apiKey = ""
 $token = ""
-$outputDirectory = "C:\TrelloBackup"
+$outputDirectory = Join-Path "C:\TrelloBackup" (Get-Date -Format "yyyyMMdd")
 $activeDirectory = Join-Path $outputDirectory "ActiveBoards"
 $closedDirectory = Join-Path $outputDirectory "ClosedBoards"
 $finalZipFile = Join-Path $outputDirectory "TrelloBackup_$(Get-Date -Format 'yyyyMMdd_HHmmss').zip"
@@ -101,6 +101,9 @@ if (Test-Path $logFile) {
 # Log the start of the backup
 Log-Message -level "INFO" -message "Backup process started."
 
+# Track start time
+$startTime = Get-Date
+
 try {
     # Get all boards
     $boardsUrl = "https://api.trello.com/1/members/me/boards?key=$apiKey&token=$token"
@@ -167,7 +170,10 @@ try {
     } | ConvertTo-Json -Depth 10
     Log-Message -level "INFO" -message "Backup Summary: $summary"
 
-    Log-Message -level "INFO" -message "Backup process completed successfully."
+    # Log elapsed time
+    $endTime = Get-Date
+    $elapsedTime = $endTime - $startTime
+    Log-Message -level "INFO" -message "Backup process completed successfully in $([math]::Round($elapsedTime.TotalSeconds)) seconds."
 } catch {
     Log-Message -level "ERROR" -message "Backup process failed: $_"
 }
