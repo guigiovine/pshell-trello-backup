@@ -64,7 +64,8 @@ function Compress-All {
         [string]$sourceDirectory,
         [string]$outputZip
     )
-    Compress-Archive -Path "$sourceDirectory\*" -DestinationPath $outputZip -Force
+    $filesToCompress = Get-ChildItem -Path $sourceDirectory -Recurse -File | Where-Object { $_.Extension -notlike ".zip" }
+    Compress-Archive -Path $filesToCompress.FullName -DestinationPath $outputZip -Force
     Log-Message -level "INFO" -message "Compressed all backups into $outputZip"
 }
 
